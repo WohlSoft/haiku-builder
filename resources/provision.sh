@@ -2,9 +2,24 @@
 
 set -exu
 
+# Run a command until it succeeds, to ride out a failed package download. A
+# single "Interrupted system call" from pkgman would otherwise fail the build.
+retry() {
+  attempt=1
+
+  until "$@"; do
+    if [ "$attempt" -ge 3 ]; then
+      return 1
+    fi
+
+    attempt=$((attempt + 1))
+    sleep 5
+  done
+}
+
 install_extra_packages() {
-  pkgman refresh
-  pkgman install bash curl rsync -y
+  retry pkgman refresh
+  retry pkgman install bash curl rsync -y
 }
 
 add_sudo_shim() {

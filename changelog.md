@@ -13,6 +13,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   detect virtio-blk disks, and virtio-scsi is what the action boots the image
   with anyway
 
+### Fixed
+- Retry the package installation. A single failed download would fail the whole
+  build
+
 ## [0.1.0] - 2026-04-29
 ### Changed
 - Enable immutable releases ([action#140](https://github.com/cross-platform-actions/action/issues/140))
