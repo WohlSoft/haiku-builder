@@ -21,6 +21,10 @@ The following architectures and versions are supported:
 | r1beta5 | ✓      |
 | r1beta6 | ✓      |
 
+r1beta5 can no longer be built: upstream has removed its package repository, so
+the extra packages cannot be installed. Its image is copied from a previous
+release instead.
+
 ## Building Locally
 
 ### Prerequisite

@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Install onto a virtio-scsi disk instead of a virtio-blk one. r1beta6 does not
   detect virtio-blk disks, and virtio-scsi is what the action boots the image
   with anyway
+- Copy the r1beta5 image from the previous release instead of building it.
+  Upstream has removed r1beta5's package repository, so the build can no longer
+  install the extra packages
 
 ### Fixed
 - Retry the package installation. A single failed download would fail the whole
