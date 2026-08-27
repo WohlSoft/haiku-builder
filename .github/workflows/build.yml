@@ -21,6 +21,9 @@ jobs:
             - name: 'r1beta5'
               uname_version: hrev57937
 
+            - name: 'r1beta6'
+              uname_version: hrev59866
+
           architecture:
             - name: x86-64
               uname: x86_64

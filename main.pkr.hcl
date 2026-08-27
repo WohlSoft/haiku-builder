@@ -74,6 +74,25 @@ variable "acceleration" {
   description = "Indicates if hardware acceleration should be enabled or not"
 }
 
+variable "qmp_socket" {
+  default = ""
+  type = string
+  description = <<-EOF
+    The path of a Unix socket where QEMU should expose a QMP monitor of its own,
+    for tooling that inspects the guest while it builds. When empty, no extra
+    monitor is opened.
+  EOF
+}
+
+variable "install_wait" {
+  default = "1m"
+  type = string
+  description = <<-EOF
+    How long to wait for the installation to finish. One minute is enough with
+    hardware acceleration; a build without it needs considerably longer.
+  EOF
+}
+
 locals {
   iso_target_extension = "iso"
   iso_target_path = "packer_cache"
@@ -113,12 +132,19 @@ source "qemu" "qemu" {
 
     var.acceleration ? [["-accel", "kvm"], ["-accel", "hvf"], ["-accel", "tcg"]] : [],
 
+    var.qmp_socket != "" ? [["-qmp", "unix:${var.qmp_socket},server=on,wait=off"]] : [],
+
     [
       ["-device", "qemu-xhci"],
       ["-device", "usb-tablet"],
       ["-device", "nec-usb-xhci,id=usb-controller-0"],
 
-      ["-device", "virtio-blk,drive=drive0,bootindex=0"],
+      // r1beta6 does not detect virtio-blk disks, and virtio-scsi is what the
+      // action boots the resulting image with anyway.
+      ["-device", "virtio-scsi-pci"],
+      // The vendor string becomes the disk's name, which DriveSetup offers as
+      // the name of the volume it formats.
+      ["-device", "scsi-hd,drive=drive0,bootindex=0,vendor=Haiku,product="],
       ["-device", "ide-cd,drive=drive1,bootindex=1"],
       ["-drive", "if=none,file={{ .OutputDir }}/{{ .Name }},id=drive0,cache=writeback,discard=ignore,format=qcow2"],
       ["-drive", "if=none,file=${local.iso_full_target_path},id=drive1,media=disk,format=raw,readonly=on"],
@@ -147,23 +173,28 @@ source "qemu" "qemu" {
     // Installer
     ["<tab><wait>", "Keymap"],
     ["<tab><wait>", "Select 'Install Haiku'"],
-    ["<spacebar><wait>", "Press 'Install Haiku'"],
+    ["<spacebar><wait15s>", "Press 'Install Haiku'"],
 
-    ["<enter><wait>", "Continue"],
+    ["<enter><wait5s>", "Continue"],
 
-    ["<enter><wait>", "No parations have been found ..."],
+    ["<enter><wait5s>", "No parations have been found ..."],
 
     ["<tab><wait>", "Install from"],
     ["<tab><wait>", "Onto"],
     ["<tab><wait>", "Show optional packages"],
     ["<tab><wait>", "Select 'Set up partions'"],
-    ["<spacebar><wait>", "Press 'Set up partions'"],
+    ["<spacebar><wait20s>", "Press 'Set up partions'"],
 
     // DriveSetup
-    ["<down><wait>", "DVD 1 - Haiku"],
-    ["<down><wait>", "DVD 1 - haiku eps"],
-    /*["<down><wait>", "DVD 2"],*/
-    ["<down><wait>", "/dev/disk/virtual/virtio_block/0/raw"],
+    // The list opens with nothing selected, and the first <down> lands on
+    // either the first or the second row, depending on whether the list has
+    // taken focus yet. The selection stops at the last row instead of wrapping
+    // around, so pressing down more times than the list has rows always ends
+    // up on the disk, which sorts after the DVD that was booted from.
+    [
+      "<down><down><down><down><down><down><wait>",
+      "Select '/dev/disk/scsi/1/0/0/raw'"
+    ],
     ["<leftAltOn><esc><leftAltOff><wait>", "open main menu"],
     ["<right><wait>", "Partition"],
     ["<down><wait>", "Select 'Format'"],
@@ -174,27 +205,27 @@ source "qemu" "qemu" {
     ["<spacebar><wait>", "Press 'Be File System'"],
 
     ["<tab><wait>", "Select Continue"],
-    ["<spacebar><wait>", "Press Continue"],
+    ["<spacebar><wait5s>", "Press Continue"],
 
-    ["<enter><wait>", "Format"],
+    ["<enter><wait5s>", "Format"],
 
     // Are you sure you want to write the changes back to disk now?
     ["<tab><wait>", "Select 'Write changes'"],
-    ["<spacebar><wait>", "Press 'Write changes'"],
+    ["<spacebar><wait15s>", "Press 'Write changes'"],
 
     // The partion "Haiku" has been successfully formatted.
-    ["<enter><wait>", "OK"],
+    ["<enter><wait5s>", "OK"],
 
     // DriveSetup
-    ["<leftAltOn>w<leftAltOff><wait>", "Close"],
+    ["<leftAltOn>w<leftAltOff><wait10s>", "Close"],
 
     // Installer
     ["<leftShiftOn><tab><leftShiftOff><wait>", "Show optional packages"],
     ["<leftShiftOn><tab><leftShiftOff><wait>", "Select 'Onto'"],
     ["<down><wait>", "Open 'Onto'"],
-    ["<up><wait>", "Select '/dev/disk/virtual/virtio_block/0/raw'"],
-    ["<enter><wait>", "Press '/dev/disk/virtual/virtio_block/0/raw'"],
-    ["<enter><wait1m>", "Begin"],
+    ["<up><wait>", "Select '/dev/disk/scsi/1/0/0/raw'"],
+    ["<enter><wait>", "Press '/dev/disk/scsi/1/0/0/raw'"],
+    ["<enter><wait${var.install_wait}>", "Begin"],
     ["<enter>", "Restart"],
     ["<wait2m>", "Wait for restart"],
 

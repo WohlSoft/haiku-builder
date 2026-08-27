@@ -5,6 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Add support for Haiku r1beta6
+
+### Changed
+- Install onto a virtio-scsi disk instead of a virtio-blk one. r1beta6 does not
+  detect virtio-blk disks, and virtio-scsi is what the action boots the image
+  with anyway
 
 ## [0.1.0] - 2026-04-29
 ### Changed

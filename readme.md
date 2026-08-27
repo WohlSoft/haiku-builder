@@ -19,6 +19,7 @@ The following architectures and versions are supported:
 | Version | x86-64 |
 |---------|--------|
 | r1beta5 | ✓      |
+| r1beta6 | ✓      |
 
 ## Building Locally
 
@@ -44,6 +45,16 @@ The following architectures and versions are supported:
 
 The above command will build the VM image and the resulting disk image will be
 at the path: `output/haiku-r1beta5-x86-64.qcow2`.
+
+### Building Without Hardware Acceleration
+
+The boot commands are typed into the guest, and their default timings assume
+hardware acceleration. On a host that has to emulate x86-64, such as an Apple
+silicon Mac, give the installation more time:
+
+```
+./build.sh <version> <architecture> -var install_wait=10m
+```
 
 ## Additional Information
 
