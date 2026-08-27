@@ -15,6 +15,9 @@ jobs:
   build:
     name: ${{ matrix.version.name }}, ${{ matrix.architecture.name }}
     runs-on: ubuntu-latest
+    # A boot command that goes astray leaves Packer waiting for SSH for its
+    # ssh_timeout, which is hours. Fail while the log is still worth reading.
+    timeout-minutes: 30
     strategy:
         matrix:
           version:
