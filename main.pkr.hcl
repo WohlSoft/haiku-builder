@@ -255,13 +255,6 @@ source "qemu" "qemu" {
       "curl 'http://{{.HTTPIP}}:{{.HTTPPort}}/resources/ssh_shell.sh' -o /boot/home/ssh_shell.sh && chmod +x /boot/home/ssh_shell.sh<enter><wait>",
       "Copy SSH command wrapper"
     ],
-
-    // Install extra packages
-    [
-      "pkgman install -y libsdl2 libsdl2_devel cmake ninja git lftp<enter><wait60s>",
-      "Pre-install a set of packages required for the build"
-    ],
-
     // Quit the terminal
     ["exit<enter><wait>", "Exit Terminal"],
 

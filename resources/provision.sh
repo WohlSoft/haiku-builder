@@ -20,6 +20,8 @@ retry() {
 install_extra_packages() {
   retry pkgman refresh
   retry pkgman install bash curl rsync -y
+  # For needs of TheXTech build
+  retry pkgman install gcc gcc_syslibs libsdl2 libsdl2_devel cmake ninja git lftp -y
 }
 
 add_sudo_shim() {
