@@ -1,6 +1,3 @@
-# About
-This is the custom Haiku image with pre-installed dependencies needed for projects of the WohlSoft Team.
-
 # Changelog
 All notable changes to this project will be documented in this file.
 
