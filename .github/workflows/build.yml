@@ -23,9 +23,9 @@ jobs:
           version:
             # Upstream has removed r1beta5's package repository, so the
             # image can no longer be built.
-            - name: 'r1beta5'
-              uname_version: hrev57937
-              copy_from_previous_release: true
+            #- name: 'r1beta5'
+            #  uname_version: hrev57937
+            #  copy_from_previous_release: true
 
             - name: 'r1beta6'
               uname_version: hrev59866
