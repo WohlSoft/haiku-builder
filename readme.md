@@ -1,5 +1,7 @@
 # Haiku Builder
 
+**This is the custom Haiku image with pre-installed dependencies needed for projects of the WohlSoft Team.**
+
 This project builds the Haiku VM image for the
 [cross-platform-actions/action](https://github.com/cross-platform-actions/action)
 GitHub action. The image contains a standard Haiku installation.
